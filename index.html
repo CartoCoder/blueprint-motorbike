@@ -58,6 +58,14 @@
       filter: drop-shadow(0 0 2px rgba(255,255,255, 0.4));
     }
 
+    button {
+      background: transparent;
+      color: white;
+      border: none;
+      font-family: "Cutive Mono", monospace;
+      cursor: pointer;
+    }
+
   </style>
 <link
 rel="stylesheet"
@@ -104,9 +112,11 @@ href="https://js.arcgis.com/4.12/esri/themes/light/main.css"
             date: "Thu Mar 14 2019 18:48:45 GMT+0100 (Central European Standard Time)",
             directShadowsEnabled: false
           }
+        },
+        ui: {
+          components: []
         }
       });
-      view.ui.empty();
 
       var url = "./triumph_bonneville_cafe_racer/scene.gltf";
 
@@ -167,6 +177,14 @@ href="https://js.arcgis.com/4.12/esri/themes/light/main.css"
       });
     });
 
+    lost.addEventListener("click", function() {
+      view.goTo({
+        position: [8.54003356, 47.37808604, 23.23007],
+        heading: 119.44,
+        tilt: 76.57
+      });
+    })
+
   });
 
   </script>
@@ -181,6 +199,7 @@ href="https://js.arcgis.com/4.12/esri/themes/light/main.css"
       by <a href="https://www.behance.net/maciekptaszynski" target="_blank">Maciek Ptaszynski</a>. Rendered as a blueprint with
       <a href="https://developers.arcgis.com/javascript/" target="_blank">ArcGIS API for JavaScript</a>.
     </p>
+    <button id="lost">I got lost, show me the bike.</button>
   </div>
 </body>
 
