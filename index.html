@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1">
+  <title>Motorbike blueprint</title>
+  <link href="https://fonts.googleapis.com/css?family=Cutive+Mono" rel="stylesheet">
+  <style>
+    html,
+    body,
+    #viewDiv {
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      width: 100%;
+    }
+
+    body {
+      background-color: #269;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, .2) 2px, transparent 2px),
+        linear-gradient(90deg, rgba(255, 255, 255, .2) 2px, transparent 2px),
+        linear-gradient(rgba(255, 255, 255, .05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, .05) 1px, transparent 1px);
+      background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
+      background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
+      font-family: "Cutive Mono", monospace;
+      font-size: 1.1em;
+      color: white;
+    }
+
+    #random {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      max-width: 300px;
+    }
+
+    h4 {
+      border-bottom: 1px solid white;
+    }
+
+    a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    #loadDiv {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      margin-left: -50px;
+    }
+
+    #viewDiv canvas {
+      filter: drop-shadow(0 0 2px rgba(255,255,255, 0.4));
+    }
+
+  </style>
+<link
+rel="stylesheet"
+href="https://js.arcgis.com/4.12/esri/themes/light/main.css"
+/>
+<script src="https://js.arcgis.com/4.12/"></script>
+<script>
+  require([
+      "esri/WebScene",
+      "esri/views/SceneView",
+      "esri/Graphic",
+      "esri/layers/GraphicsLayer",
+      "esri/geometry/Mesh",
+      "esri/geometry/Point",
+      "esri/core/watchUtils"
+    ], function (WebScene, SceneView, Graphic, GraphicsLayer, Mesh, Point, watchUtils) {
+
+      // Load webscene and display it in a SceneView
+      const webscene = new WebScene({
+        basemap: "topo",
+        ground: {
+          opacity: 0
+        }
+      });
+
+      const view = new SceneView({
+        container: "viewDiv",
+        map: webscene,
+        camera: {
+          position: [8.55222998, 47.37401037, 247.80833],
+          heading: 297.97,
+          tilt: 77.48
+        },
+        qualityProfile: "high",
+        alphaCompositingEnabled: true,
+        environment: {
+          background: {
+            type: "color",
+            color: [0, 0, 0, 0]
+          },
+          starsEnabled: false,
+          atmosphereEnabled: false,
+          lighting: {
+            date: "Thu Mar 14 2019 18:48:45 GMT+0100 (Central European Standard Time)",
+            directShadowsEnabled: false
+          }
+        }
+      });
+      view.ui.empty();
+
+      var url = "./triumph_bonneville_cafe_racer/scene.gltf";
+
+      const gl = new GraphicsLayer({
+        elevationInfo: {
+          mode: "absolute-height"
+        }
+      });
+      webscene.layers.add(gl);
+
+      const center = new Point({
+        x: 8.540255209154225,
+        y: 47.37799080320068,
+        z: 15
+      });
+
+      let graphic = null;
+
+      Mesh.createFromGLTF(center,
+      url)
+      .then(function (geometry) {
+        graphic = new Graphic({
+            geometry,
+            symbol: {
+              type: "mesh-3d", // autocasts as new MeshSymbol3D()
+              symbolLayers: [{
+                type: "fill", // autocasts as new FillSymbol3DLayer()
+                material: {
+                  color: [255, 255, 255, 0],
+                  colorMixMode: "replace"
+                },
+                edges: {
+                  type: "solid",
+                  color: [255, 255, 255, 1],
+                  size: 2.5
+                }
+              }]
+            }
+          });
+
+      gl.add(graphic);
+    })
+    .catch(console.error);
+
+    window.view = view;
+
+    view.when(function() {
+      watchUtils.whenFalseOnce(view, "updating", function() {
+        loadDiv.style.display = "none";
+        view.goTo(graphic.geometry.extent.expand(0.9))
+        .then(function() {
+          view.goTo({
+            position: [8.54003356, 47.37808604, 23.23007],
+            heading: 119.44,
+            tilt: 76.57
+          }, {speedFactor: 0.2});
+        });
+      });
+    });
+
+  });
+
+  </script>
+</head>
+
+<body>
+  <div id="viewDiv"></div>
+  <div id="loadDiv">Loading...</div>
+  <div id="random">
+    <h4>TRIUMPH BONNEVILLE CAFE RACER</h4>
+    <p>Original <a href="https://sketchfab.com/3d-models/triumph-bonneville-cafe-racer-85c43bc85b654e95b69cbb96738a1cd6" target="_blank">3D model</a>
+      by <a href="https://www.behance.net/maciekptaszynski" target="_blank">Maciek Ptaszynski</a>. Rendered as a blueprint with
+      <a href="https://developers.arcgis.com/javascript/" target="_blank">ArcGIS API for JavaScript</a>.
+    </p>
+  </div>
+</body>
+
+</html>
